@@ -215,6 +215,123 @@ var TRUTH_HTML = '<div class="dsec"><div class="kicker">What was actually true</
 var FOOTER_HTML = '<footer class="sitefooter">NukkadEats, PayZing, Bhukkad and Saral Ventures are fictional. Inspired by patterns, not incidents.<br>Built in India · A structured-debrief simulator — no AI grades your words.</footer>';
 var PTS = {A1:3,A2:3,A3:3,A5:3,A11:3,A4:1,A7:1,A8:1,A10:1,A6:0,A9:0,A12:0};
 
+var DECISION_INFORMED_IDS = ['A1','A2','A3','A5'];
+
+var DECISION_OPTIONS = {
+  D1: {short:'Full rollback', t:'Full rollback, now.', b:'Revert the entire Rocket release to the old 5-step checkout. Config flip, live in 30 minutes. Figure out the rest later.'},
+  D2: {
+    informed: {short:'Surgical rollback', t:'Surgical rollback: restore COD, keep the rest.', b:'Flip the config: COD back as a visible top-level option next to UPI. Keep the 2-screen flow, the cashback, the free-delivery nudge. Push a notification to lapsed cash users: “Cash on Delivery is back — exactly as before.”'},
+    default: {short:'Partial rollback', t:'Partial rollback: revert <em>something</em>, keep the rest.', b:'The release had multiple pieces. Revert the most aggressive-looking piece, keep the rest. You’ll have to judge which piece from the release notes.'}
+  },
+  D3: {short:'Hold 48 hours', t:'Hold. Gather data for 48 hours, then decide.', b:'Don’t touch production on a Monday morning guess. Instrument properly, run the analysis, decide Wednesday with evidence.'},
+  D4: {short:'Fix forward', t:'Ship a fix forward: banner + apology push.', b:'Don’t roll back — patch. Add a “COD available — scroll for more options” banner on the payment screen and push-notify affected users tonight.'},
+  D5: {short:'Metrics are suspect', t:'Tell the board the metrics are suspect.', b:'Priya has a point — the checkout events were rebuilt Friday. Declare the numbers unverified, commit to a data audit, and don’t act on production.'}
+};
+
+var DECISION_CONSEQUENCE = {
+  D1: function(){
+    return '<p>By Monday lunch the old checkout is back. Tuesday orders: <span class="m">−6%</span> vs baseline. Wednesday: <span class="m">−2%</span>. The bleeding stops — the burned users drift back slower than they left; a slice tried Bhukkad and some of them liked it. You also gave back everything: the margin gains, the cashback momentum, the 2-screen flow people actually liked. Dhruv is publicly annoyed — “we reverted five weeks of work because nobody could say <em>what</em> was wrong.”</p>'+
+      '<p>At Friday’s review, Anurag asks the question you’ll hear again in the board follow-up:</p>'+
+      cqBubble(SC().cast.anurag, '“Rollback was right. But what did we learn — what exactly do we un-revert, and when?”');
+  },
+  D2: {
+    informed: function(){
+      return '<p>Config live at <span class="m">11:20</span>. Tuesday orders <span class="m">−4%</span>, Thursday <span class="m">+1%</span> vs baseline — and AOV holds at <span class="m">₹331</span>, because the cashback padding survives even with COD back. Net revenue settles at <span class="m">+3%</span> with the base intact. Some COD users take a week and one push notification to trust you again; Gwalior recovers last. Farheen’s queue halves by Wednesday.</p>'+
+        '<p>Dhruv’s one-line reply to the config PR:</p>'+
+        cqBubble(SC().cast.dhruv, '“should have been a one-tap option from day one. my bad too.”')+
+        '<p>The fix worked because it was aimed — you kept what was earning and removed only what was breaking.</p>';
+    },
+    default: function(){
+      return '<p>Under time pressure you pick the loudest visible change — the cashback banner — and revert it. Tuesday orders: still <span class="m">−16%</span>. The banner was never the problem; the buried COD option was, and you didn’t have the data to know it. You’ve now spent the rollback card, kept the damage, and lost the one lever (cashback) that was genuinely working. Wednesday you end up doing the full rollback anyway, two days and <span class="m">~28,000 orders</span> late.</p>';
+    }
+  },
+  D3: function(){
+    return '<p>Rigorous — and expensive. Monday and Tuesday each bleed <span class="m">~8,000 orders</span> below baseline, and the Sunday-to-Monday trend (<span class="m">−21% → −24%</span>) keeps worsening: this isn’t a dip mean-reverting, it’s frequent users churning. Wednesday’s analysis confirms what the weekend data already showed.</p>'+
+      '<p>On the board call, “we’re gathering data” lands as “we don’t know and we’re not acting.” Aditya’s follow-up email asks for a daily orders report — which is how boards say “we’re watching you now.” In a marketplace, hesitation is a decision too: Bhukkad’s Kanpur numbers had a very good week.</p>';
+  },
+  D4: function(){
+    return '<p>Live by evening. Tuesday orders claw back to <span class="m">−11%</span>. It half-works: users who open checkout can now find COD with effort, but the flow still <em>treats cash like a legacy option</em>, and tier-3 users keep reading it as “this app is not for us anymore.” A banner apologizing for the UI under the banner is design debt announcing itself.</p>'+
+      '<p>Recovery stalls at <span class="m">−8%</span> by Friday. It’s the patch you ship when you know <em>where</em> it hurts but haven’t accepted <em>why</em>.</p>';
+  },
+  D5: function(picks){
+    if (picks.indexOf('A8')>=0) return '<p>You verified the tracking yourself this morning — it reconciles to <span class="m">0.4%</span> against the restaurant-side system. You’d be walking into the board with a theory you personally disproved two hours ago.</p>';
+    return '<p>Tuesday morning, Riya runs the reconciliation Priya suggested: the events match the restaurant-side system within <span class="m">0.4%</span>. The numbers were real. You spent your board meeting vouching for a theory that took one query to kill — a query you could have run Monday.</p>'+
+      '<p>Meanwhile the orders line kept falling, and Wednesday’s board follow-up now questions the dashboard <em>and</em> the PM. Trust in the data is expensive to rebuild — and it was never broken.</p>';
+  }
+};
+
+var DECISION_PTS = {D1:3, D2:{informed:5, default:1}, D3:1, D4:2, D5:0};
+
+var FRAMING_CONSEQUENCE = {
+  F1: {
+    informed: function(){
+      return '<p>Anurag repeats your sentence on the call almost word for word:</p>'+
+        cqBubble(SC().cast.anurag, '“We optimized checkout for margin and accidentally buried Cash on Delivery — our core users’ payment method. Orders dropped 17%, concentrated in our most cash-dependent cities. It’s restored as of this morning; here are the three numbers we’re watching this week.”')+
+        '<p>Silence, then Aditya: “Painful. Clear. Good.” The meeting moves to the next agenda item — which is what a good incident update earns: <em>less</em> meeting. The follow-up email asks for a one-week recovery note, not a daily report.</p>';
+    },
+    default: function(){
+      return '<p>Honesty without a diagnosis is a harder sell. “Orders fell <span class="m">17%</span>, we believe it’s linked to Friday’s release, we’ve acted and we’re investigating the mechanism” is respectable — boards forgive bad weeks, not fog.</p>'+
+        '<p>Aditya’s question — “which users, specifically?” — has no answer yet, and the room notices. Follow-up: daily reports until you can say <em>who</em> and <em>why</em>.</p>';
+    }
+  },
+  F2: function(){
+    return '<p>It works — for one meeting. Aditya notes “good margin progress.” Then the next fortnight’s cohort data lands: the <span class="m">−17%</span> wasn’t users “adapting”, it was your highest-frequency cohort leaving, and it’s visible in week-2 retention. The correction email you have to send is the most expensive document a PM writes — it re-opens the original incident <em>plus</em> the question of why the first framing hid it.</p>'+
+      '<p>Anurag’s message after:</p>'+
+      cqBubble(SC().cast.anurag, '“I looked confident saying it because you looked confident writing it. Never again.”')+
+      '<p>Metrics chosen to flatter a bad weekend always mature into their real value.</p>';
+  },
+  F3: function(){
+    return '<p>Technically defensible — the Thursday-night Figma change <em>did</em> deepen the COD burial beyond the PRD’s wording. The board doesn’t care: to them, the product is the PM’s. Aditya asks, “who approved the build?” and every path from that question ends at you.</p>'+
+      '<p>By Tuesday, Dhruv has seen the board notes. His message:</p>'+
+      cqBubble(SC().cast.dhruv, '“Noted. Next release, I’ll need written sign-off on every screen. That’s what you’re asking for, right?”')+
+      '<p>— and your fastest shipping relationship now moves at the speed of paperwork. You traded one bad meeting for a slow team.</p>';
+  },
+  F4: function(){
+    return '<p>Anurag buys you the time, at his own expense — he absorbs the awkward ten minutes. Reasonable, if your 48 hours have a shape (“payment-mix analysis, city split, cohort read — Wednesday 9 AM, written”).</p>'+
+      '<p>But the meeting after this meeting is Anurag asking why his PM had two hours and came back with a request instead of a read. Time is a legitimate ask; it just isn’t free, and the person paying is the one who vouched for you.</p>';
+  }
+};
+
+var FRAMING_MOD = {F1:3,F4:1,F2:0,F3:-2};
+
+var DECISION_LINE = {
+  D1: 'Full rollback was the classic safe call — stop the bleeding, ask questions later. It worked, and no one should be ashamed of it. Its cost was precision: you gave back the genuinely good parts of Rocket, and ‘what exactly do we un-revert’ became next week’s harder question.',
+  D2: {
+    informed: 'The surgical revert was the highest-skill move available — but only because you’d earned it. Keeping the cashback and the 2-screen flow while restoring COD kept the margin win <em>and</em> the base. Evidence is what converts a risky partial rollback into a precise one.',
+    default: 'A partial rollback without knowing which part — you reverted the loudest change (the banner) and kept the actual cause. The instinct to be surgical was right; surgery without imaging is how it goes wrong. The same decision, made after one payment-split query, is the best move in the scenario.'
+  },
+  D3: 'Holding for data is the right call more often than Twitter thinks — but the weekend <em>was</em> the data: three days, worsening daily, loyal users first. When the trend is compounding, ‘wait 48 hours’ is choosing a number for how much more you’ll lose to learn what you already had enough evidence to act on.',
+  D4: 'The forward-fix treated the symptom at the site of the pain — visible, fast, and it half-worked. Its ceiling was built in: a banner explaining where COD is hidden concedes that it’s hidden. When a design choice is the incident, the fix is the design, not signage on top of it.',
+  D5: 'Declaring the metrics suspect was the most dangerous move on the board, because it converts a product incident into a credibility incident. One reconciliation query — orders vs the untouched restaurant-side system — was all it took to test, and it took Riya twenty minutes on Tuesday.'
+};
+
+var FRAMING_LINE = {
+  F1: 'You told it straight, with a plan attached. Boards forgive bad weekends; they price in fog. The honest version with a diagnosis is the only framing in this scenario that <em>ends</em> the incident in one meeting.',
+  F2: 'Leading with revenue bought one good meeting with money borrowed from the next one. The cohort data was always going to arrive; framings that depend on nobody running a query have short lives.',
+  F3: 'Pointing at engineering had a factual kernel — the Thursday Figma change was real — but the board reads product outcomes as PM outcomes, and your eng lead reads board notes. You paid twice: once in the room, once in every future release that now needs paperwork.',
+  F4: 'Asking for time is legitimate — leaders do it — but it transfers the cost to the person vouching for you. It lands well only when the 48 hours have a shape: named analyses, a date, a written artifact. Time with a plan is strategy; time without one is hope.'
+};
+
+function s01Dims(picks, decision, framing, sc){
+  function clamp(v){ return Math.max(1, Math.min(5, v)); }
+  function count(ids){ var n=0; for (var i=0;i<ids.length;i++) if (picks.indexOf(ids[i])>=0) n++; return n; }
+  var ps = sc.pickScore;
+  var logical = ps<=2?1:ps<=5?2:ps<=8?3:ps<=11?4:5;
+  var data = [1,2,3,4,5][count(['A1','A5','A11','A8'])];
+  var traps = count(['A6','A9','A12']);
+  var assumption = [5,3,2,1][traps];
+  var d2informed = decision==='D2' && sc.informed;
+  var risk = d2informed?5 : decision==='D1'?4 : decision==='D4'?3 : decision==='D3'?2 : decision==='D2'?2 : 1;
+  var sharps = count(['A1','A2','A3','A5','A11']);
+  var prior = [1,2,3,4,5][sharps];
+  var stake = 3 + (framing==='F1'?1:framing==='F3'?-2:framing==='F2'?-1:0) + (picks.indexOf('A6')>=0?-1:0);
+  stake = clamp(stake);
+  var empathy = picks.indexOf('A2')>=0?5 : (picks.indexOf('A11')>=0||picks.indexOf('A7')>=0)?3 : 2;
+  var biz = clamp((sc.decisionScore>=3?4:2) + (framing==='F2'?-1:0) + (d2informed?1:0));
+  var comm = framing==='F1'?5:framing==='F4'?3:framing==='F2'?2:1;
+  return [logical, data, assumption, risk, prior, stake, empathy, biz, comm];
+}
+
 /* Registry facade — P3 will switch the engine to read scenarios through this. */
 window.PMSIM = window.PMSIM || { scenarios: {} };
 window.PMSIM.scenarios['s01'] = {
@@ -227,21 +344,59 @@ window.PMSIM.scenarios['s01'] = {
   onepagerLabel: SC_META.onepagerLabel,
   times: TIMES,
   cast: P,
+  ceoKey: 'anurag',
+  dashTitle: 'Weekend overview',
+  statusBarLabel: 'NukkadOS',
+  lockHint: 'Tap the message from Anurag ↑',
+  beginBarText: '10:45 AM — Anurag’s chat pops up',
+  cabin: {
+    sceneline: '10:58 AM · Anurag’s cabin',
+    narration: 'Anurag closes his laptop.',
+    pullquote: '“Board dials in at 11. Aditya will look at one slide for ten seconds and ask me one question: <em>what happened?</em> Give me the sentence.”',
+    pqBy: 'Anurag Bansal · CEO'
+  },
   notifs: NOTIFS,
   ceoBubbles: CEO_BUBBLES,
   onepager: ONEPAGER,
   dashRows: DASH_ROWS,
+  dash: {
+    metricsCaption: 'Weekend metrics vs 4-weekend baseline',
+    metricsHeaders: ['This weekend', 'Baseline'],
+    sub: 'Sat 00:00 → Mon 09:00 · vs trailing 4-weekend avg',
+    trend: {
+      ariaLabel: 'Orders vs baseline by day',
+      columns: [
+        { label: 'SAT', pct: '−13%', barWidth: 26 },
+        { label: 'SUN', pct: '−21%', barWidth: 42 },
+        { label: 'MON', pct: '−24%', barWidth: 48 }
+      ],
+      note: '— it’s getting worse, not better.',
+      vh: 'Orders vs baseline: Saturday minus 13 percent, Sunday minus 21 percent, Monday till 9 AM minus 24 percent.'
+    }
+  },
   inbox: INBOX,
   menu: { order: MENU_ORDER, byId: MENU_BY_ID },
   fopts: FOPTS,
   pts: PTS,
+  dims: s01Dims,
+  decision: { informedIds: DECISION_INFORMED_IDS, options: DECISION_OPTIONS, consequence: DECISION_CONSEQUENCE, pts: DECISION_PTS },
+  framing: { consequence: FRAMING_CONSEQUENCE, mod: FRAMING_MOD },
   debrief: {
     bands: { title: BAND_TITLE, text: BAND_TEXT },
     pickLines: PICK_LINES,
     missedClauses: MISSED_CLAUSES,
     orientHtml: ORIENT_HTML,
     truthHtml: TRUTH_HTML,
-    footerHtml: FOOTER_HTML
+    footerHtml: FOOTER_HTML,
+    decisionLine: DECISION_LINE,
+    framingLine: FRAMING_LINE,
+    integrity: {
+      pick: 'A8',
+      decision: 'D5',
+      text: function(pt){
+        return 'One more thing, said plainly, because a mentor should: you verified the tracking at '+pt+', and then told the board the tracking was suspect. That’s not a data mistake — the data was fine and you knew it. Under pressure, ‘the numbers might be wrong’ is the most tempting sentence in product management. It is almost never the one to say.';
+      }
+    }
   },
   share: { url: SHARE_URL },
   revealBody: revealBody
