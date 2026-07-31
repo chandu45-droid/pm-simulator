@@ -334,6 +334,7 @@ function s01Dims(picks, decision, framing, sc){
 
 /* Registry facade — P3 will switch the engine to read scenarios through this. */
 window.PMSIM = window.PMSIM || { scenarios: {} };
+window.PMSIM.APP_NAME = window.PMSIM.APP_NAME || 'PM Simulator';
 window.PMSIM.scenarios['s01'] = {
   id: 's01',
   title: SC_META.h1,
@@ -349,6 +350,9 @@ window.PMSIM.scenarios['s01'] = {
   statusBarLabel: 'NukkadOS',
   lockHint: 'Tap the message from Anurag ↑',
   beginBarText: '10:45 AM — Anurag’s chat pops up',
+  orientHead: 'It’s Monday, 9:04 AM.',
+  clock: { day: 'Monday', orientTime: '9:04 AM', lockStart: '07:58', lockReveal: '09:04', chatTime: '9:04 AM', deadline: 'until 10:45' },
+  chat: { channel: 'nukkad-hq', avatars: [{ t: 'S', bg: 'var(--ink-500)' }, { t: 'R', bg: 'var(--brand-600)' }, { t: 'F', bg: 'var(--gain-700)' }] },
   cabin: {
     sceneline: '10:58 AM · Anurag’s cabin',
     narration: 'Anurag closes his laptop.',
@@ -398,6 +402,6 @@ window.PMSIM.scenarios['s01'] = {
       }
     }
   },
-  share: { url: SHARE_URL },
+  share: { url: SHARE_URL, line: 'One tense Monday morning at a food-delivery startup, misleading signals, no right answers.' },
   revealBody: revealBody
 };

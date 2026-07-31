@@ -7,20 +7,20 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="color-scheme" content="light">
-<meta name="description" content="Rocket Landing — a playable PM decision simulator. One tense Monday morning at a fictional Indian food-delivery startup. A structured-debrief simulator — no AI grades your words.">
+<meta name="description" content="PM Simulator — a playable PM decision simulator. One tense Monday morning at a fictional Indian food-delivery startup. A structured-debrief simulator — no AI grades your words.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://chandu45-droid.github.io/pm-simulator/">
-<meta property="og:site_name" content="Rocket Landing">
-<meta property="og:title" content="Rocket Landing — a playable PM decision simulator">
+<meta property="og:site_name" content="PM Simulator">
+<meta property="og:title" content="PM Simulator — a playable PM decision simulator">
 <meta property="og:description" content="One tense Monday morning at a food-delivery startup. Four moves, one call, a structured debrief. No right answers.">
 <meta property="og:image" content="https://chandu45-droid.github.io/pm-simulator/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Rocket Landing — a playable PM decision simulator. A clock chip reading 10:45 AM and a row of progress pips.">
+<meta property="og:image:alt" content="PM Simulator — a playable PM decision simulator. A clock chip reading 10:45 AM and a row of progress pips.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Rocket Landing — a playable PM decision simulator">
+<meta name="twitter:title" content="PM Simulator — a playable PM decision simulator">
 <meta name="twitter:description" content="One tense Monday morning at a food-delivery startup. Four moves, one call, a structured debrief. No right answers.">
-<title>Rocket Landing — a PM decision simulator</title>
+<title>PM Simulator — a PM decision simulator</title>
 <style>
 /* ============ RESET ============ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -472,6 +472,8 @@ body.has-stickybar .stage{padding-bottom:calc(88px + env(safe-area-inset-bottom,
 <div id="overlay"></div>
 <script src="s01.js"></script>
 <script src="s02.js"></script>
+<script src="s03.js"></script>
+<script src="s04.js"></script>
 <script>
 'use strict';
 /* Set after Apps Script deploy — see WAITLIST-SETUP.md */
@@ -746,7 +748,8 @@ function mountChrome(){
   layout.classList.toggle('railwrap', wantRail);
   var oldRail = $('#noterail'); if (oldRail) oldRail.remove();
   if (wantRail){
-    var rail = h('<aside class="noterail" id="noterail" aria-label="Notes — Monday"><h3>Notes — Monday</h3><div id="railbody"></div></aside>');
+    var noteDay = (SC().clock&&SC().clock.day)||'Monday';
+    var rail = h('<aside class="noterail" id="noterail" aria-label="Notes — '+noteDay+'"><h3>Notes — '+noteDay+'</h3><div id="railbody"></div></aside>');
     layout.appendChild(rail);
     $('#railbody').appendChild(notesContent(true));
   }
@@ -970,7 +973,7 @@ function renderOrient(){
   mountChrome();
   var stage = $('#stage');
   stage.innerHTML = '<div class="orientwrap"><div class="orientcard phase-in">'+
-    '<h2 class="orienthead" id="orienthead" tabindex="-1">It’s Monday, 9:04 AM.</h2>'+
+    '<h2 class="orienthead" id="orienthead" tabindex="-1">'+(SC().orientHead||'It’s Monday, 9:04 AM.')+'</h2>'+
     SC().debrief.orientHtml+
     '<p>You get one morning to work out what happened. Where you look — and what you tell the board — decides how this ends.</p>'+
     '<div class="orientsmall">~7 minutes · every company here is fictional · a structured-debrief simulator — no AI grades your words</div>'+
@@ -1002,7 +1005,7 @@ function renderLock(){
   var stage = $('#stage');
   stage.innerHTML = phoneShell('<div class="lock" id="lockscreen">'+
     '<div class="statusstrip" aria-hidden="true"><span>'+SC().statusBarLabel+'</span><span class="statusicons">'+SVG.status+'</span></div>'+
-    '<div class="bigclock"><div class="t" id="lockclock">07:58</div><div class="d">Monday</div></div>'+
+    '<div class="bigclock"><div class="t" id="lockclock">'+((SC().clock&&SC().clock.lockStart)||'07:58')+'</div><div class="d">'+((SC().clock&&SC().clock.day)||'Monday')+'</div></div>'+
     '<div class="notifstack" id="notifstack" aria-label="Notifications"></div>'+
     '<div class="hint" id="lockhint"><span class="btn-quiet borderless">'+SC().lockHint+'</span></div></div>');
   var stack = $('#notifstack');
@@ -1016,7 +1019,7 @@ function renderLock(){
     var isCEO = i===2;
     stack.appendChild(h(notifHTML(SC().notifs[i], isCEO)));
     if (isCEO){
-      $('#lockclock').textContent = '09:04';
+      $('#lockclock').textContent = (SC().clock&&SC().clock.lockReveal)||'09:04';
       $('#ceonotif').addEventListener('click', function(){
         S.sub = 'chat'; save(); renderChat();
       });
@@ -1033,14 +1036,20 @@ function renderLock(){
 function renderChat(){
   mountChrome();
   var stage = $('#stage');
+  var chatChannel = (SC().chat&&SC().chat.channel)||'team-hq';
+  var chatAvatars = (SC().chat&&SC().chat.avatars)||[{t:'S',bg:'var(--ink-500)'},{t:'R',bg:'var(--brand-600)'},{t:'F',bg:'var(--gain-700)'}];
+  var avHTML = '';
+  for (var ai=0; ai<chatAvatars.length; ai++) avHTML += '<span style="background:'+chatAvatars[ai].bg+'">'+chatAvatars[ai].t+'</span>';
+  var chatTime = (SC().clock&&SC().clock.chatTime)||'9:04 AM';
+  var chatDay = (SC().clock&&SC().clock.day)||'Monday';
   stage.innerHTML = phoneShell('<div class="chatapp">'+
-    '<div class="chattop"><span class="ch"><span aria-hidden="true">#</span> nukkad-hq</span>'+
-    '<span class="avcluster" aria-hidden="true"><span style="background:var(--ink-500)">S</span><span style="background:var(--brand-600)">R</span><span style="background:var(--gain-700)">F</span></span></div>'+
-    '<div class="chatbody" id="chatbody"><div class="datediv"><span>Monday 9:04 AM</span></div></div>'+
+    '<div class="chattop"><span class="ch"><span aria-hidden="true">#</span> '+chatChannel+'</span>'+
+    '<span class="avcluster" aria-hidden="true">'+avHTML+'</span></div>'+
+    '<div class="chatbody" id="chatbody"><div class="datediv"><span>'+chatDay+' '+chatTime+'</span></div></div>'+
     '<div class="composer"><button class="btn-primary full" id="opendash" style="visibility:hidden">Open the dashboard</button>'+
     '<div class="fakeinput" aria-hidden="true">You\'ll respond through the dashboard, not here.</div></div></div>');
   var body = $('#chatbody');
-  typeIn(body, groupHTML(SC().cast[SC().ceoKey], '9:04 AM', SC().ceoBubbles), function(){
+  typeIn(body, groupHTML(SC().cast[SC().ceoKey], chatTime, SC().ceoBubbles), function(){
     var b = $('#opendash');
     b.style.visibility = 'visible';
     body.scrollTop = body.scrollHeight;
@@ -1064,9 +1073,9 @@ function renderChat(){
 function renderDash(){
   mountChrome();
   var stage = $('#stage');
-  stage.innerHTML = '<section class="phase-in" aria-label="The Monday dashboard">'+
+  stage.innerHTML = '<section class="phase-in" aria-label="'+SC().dashTitle+'">'+
     dashCardHTML()+ inboxSectionHTML()+
-    '<div class="beginbar"><button class="btn-primary full" id="begin">Start investigating — you have until 10:45</button></div></section>';
+    '<div class="beginbar"><button class="btn-primary full" id="begin">Start investigating — you have '+((SC().clock&&SC().clock.deadline)||'until 10:45')+'</button></div></section>';
   wireInboxRows(stage);
   $('#begin').addEventListener('click', function(){
     S.phase = 'invest'; save(); renderPhase();
@@ -1102,7 +1111,8 @@ function notesContent(isRail){
   return wrap;
 }
 function openNotes(){
-  openSheet({label:'Your notes — Monday', titleRow:'Your notes — Monday', content:notesContent(false), cls:'notesheet'});
+  var yourNotesDay = 'Your notes — '+((SC().clock&&SC().clock.day)||'Monday');
+  openSheet({label:yourNotesDay, titleRow:yourNotesDay, content:notesContent(false), cls:'notesheet'});
 }
 /* ==== SECTION:INVEST ==== */
 function addMin(t, add){
@@ -1540,7 +1550,7 @@ function renderDebrief(){
   }
   out += '<p class="dimnote"><em>Different paths through this scenario can score high on different dimensions — there is no single correct route, and more than one route reaches “Board-ready”.</em></p></div>';
   /* waitlist CTA */
-  out += '<div class="ctacard"><h2>That was one Monday. The job is hundreds of them.</h2>'+
+  out += '<div class="ctacard"><h2>That was one '+((SC().clock&&SC().clock.day)||'Monday')+'. The job is hundreds of them.</h2>'+
     '<div class="cbody">More cases are taking shape in the writers’ room right now. Join the waitlist and each new one lands in your inbox the day it ships.</div>'+
     '<form class="ctaform" id="ctaform" novalidate>'+
     '<input type="email" id="ctaemail" name="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address" required>'+
@@ -1623,12 +1633,14 @@ function wireCTA(){
 }
 /* ==== SECTION:SHARE ==== */
 function shareText(kind){
+  var appName = (window.PMSIM && window.PMSIM.APP_NAME) || 'PM Simulator';
+  var flavor = (SC().share && SC().share.line) || 'One tense Monday morning at a food-delivery startup, misleading signals, no right answers.';
   if (kind === 'debrief'){
     var sc = computeScore(S.picks, S.decision, S.framing);
     var label = SC().debrief.bands.title[sc.band].replace(/\.$/, '');
-    return 'I scored '+sc.total+'/20 — '+label+' — in Rocket Landing, a playable PM simulator. One tense Monday morning, no right answers. Think you’d land it? '+SC().share.url;
+    return 'I scored '+sc.total+'/20 — '+label+' — in '+appName+', a playable PM simulator. '+flavor+' Think you’d land it? '+SC().share.url;
   }
-  return 'Rocket Landing — a playable PM simulator. One tense Monday morning at a startup, misleading signals, no right answers. 10 minutes, free, in your browser. '+SC().share.url;
+  return appName+' — a playable PM simulator. '+flavor+' 10 minutes, free, in your browser. '+SC().share.url;
 }
 var shareConfirmTimer = null;
 function showShareConfirm(el){
