@@ -803,12 +803,12 @@ function renderHub(){
   for (var i=0;i<SLATE.length;i++) cardsHtml += dossierCardHTML(SLATE[i]);
 
   var out = '<div class="hubwrap"><div class="hubhead">'+
-    '<div class="hubkicker">Monday morning</div>'+
+    '<div class="hubkicker">Your desk</div>'+
     '<h2 class="hubtitle">Case Files</h2>'+
     '<p class="hubsub">Five companies, five mornings gone sideways. Every case plays in about ten minutes — pick one.</p></div>'+
     '<div class="dossier-grid">'+cardsHtml+'</div>'+
-    '<div class="hubcta ctacard"><h2>That was one Monday. The job is hundreds of them.</h2>'+
-    '<div class="cbody">More cases are taking shape in the writers’ room right now. Join the waitlist and each new one lands in your inbox the day it ships.</div>'+
+    '<div class="hubcta ctacard"><h2>One morning down. The job is hundreds of them.</h2>'+
+    '<div class="cbody">Want harder cases? Join the waitlist and tell us what to build next — you’ll be first in when the next one ships.</div>'+
     '<form class="ctaform" id="ctaform" novalidate>'+
     '<input type="email" id="ctaemail" name="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address" required>'+
     '<button class="btn-primary" type="submit" id="ctabtn">Join the waitlist →</button></form>'+
@@ -917,7 +917,7 @@ function inboxRowHTML(m){
 function inboxSectionHTML(){
   var rows='';
   for (var i=0;i<SC().inbox.length;i++) rows += inboxRowHTML(SC().inbox[i]);
-  return '<section class="inboxsec" aria-label="Inbox"><div class="kicker">Inbox — 9:14 AM</div><div class="inboxgroup">'+rows+'</div></section>';
+  return '<section class="inboxsec" aria-label="Inbox"><div class="kicker">Inbox — '+((SC().clock&&SC().clock.orientTime)||'9:14 AM')+'</div><div class="inboxgroup">'+rows+'</div></section>';
 }
 function wireInboxRows(root){
   var rows = root.querySelectorAll('[data-msg]');
@@ -1552,7 +1552,7 @@ function renderDebrief(){
   out += '<p class="dimnote"><em>Different paths through this scenario can score high on different dimensions — there is no single correct route, and more than one route reaches “Board-ready”.</em></p></div>';
   /* waitlist CTA */
   out += '<div class="ctacard"><h2>That was one '+((SC().clock&&SC().clock.day)||'Monday')+'. The job is hundreds of them.</h2>'+
-    '<div class="cbody">More cases are taking shape in the writers’ room right now. Join the waitlist and each new one lands in your inbox the day it ships.</div>'+
+    '<div class="cbody">Want harder cases? Join the waitlist and tell us what to build next — you’ll be first in when the next one ships.</div>'+
     '<form class="ctaform" id="ctaform" novalidate>'+
     '<input type="email" id="ctaemail" name="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address" required>'+
     '<button class="btn-primary" type="submit" id="ctabtn">Join the waitlist →</button></form>'+

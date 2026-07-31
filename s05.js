@@ -181,7 +181,7 @@ function revealBody5(id, idx){
 }
 
 var ORIENT_HTML5 = '<p>Six screenshots of other people’s orders are going viral. Your Series C term sheet signs tomorrow.</p>'+
-  '<p>You’re the Senior PM who owns order tracking at <strong>Turant</strong> — a 10-minute grocery delivery app across India’s tier-1 and tier-2 cities. A security researcher just posted proof that anyone can view another customer’s name, phone number and home address by changing a number in a URL. It’s trending. Your app rating is cratering. And in three hours you’re in a call with the lead investor on a funding round that closes tomorrow.</p>'+
+  '<p>You’re the Senior PM who owns order tracking at <strong>Turant</strong> — a 10-minute grocery delivery app across India’s tier-1 and tier-2 cities. A security researcher just posted proof that anyone can view another customer’s name, phone number and home address by changing a number in a URL. It’s trending. Your app rating is cratering. And in a couple of hours you’re in a call with the lead investor on a funding round that closes tomorrow.</p>'+
   '<p>You have until 12:30 PM to find out what actually happened — not what the six screenshots show, not what makes the next phone call easier — before you’re the one explaining it.</p>';
 var TRUTH_HTML5 = '<div class="dsec"><div class="kicker">What was actually true</div>'+
     '<p>The vulnerability itself was simple and real: <code>GET /api/order/track/{orderId}</code> returned a customer’s name, phone number, delivery address and order contents to anyone who asked for that order ID — no login, no ownership check. It shipped 19 days ago as an unreviewed side effect of a live-tracking redesign. It never touched payment data (tokenized at a separate processor) or passwords (a separate, hashed auth store) — so the frightened rumor that card numbers were exposed was never true, and the person who said so with confidence, Nisha, was right about that piece of it.</p>'+
@@ -313,8 +313,8 @@ window.PMSIM.scenarios['s05'] = {
   statusBarLabel: 'TurantOS',
   lockHint: 'Tap the message from Ishaan ↑',
   beginBarText: '12:30 PM — Ishaan’s chat pops up',
-  orientHead: 'It’s Thursday, 9:20 AM.',
-  clock: { day: 'Thursday', orientTime: '9:20 AM', lockStart: '09:12', lockReveal: '10:05', chatTime: '10:05 AM', deadline: 'until 12:30 PM' },
+  orientHead: 'It’s Thursday, 10:05 AM.',
+  clock: { day: 'Thursday', orientTime: '10:05 AM', lockStart: '09:12', lockReveal: '10:05', chatTime: '10:05 AM', deadline: 'until 12:30 PM' },
   chat: { channel: 'turant-hq', avatars: [{ t: 'M', bg: '#BE185D' }, { t: 'D', bg: '#6D28D9' }, { t: 'N', bg: '#B45309' }] },
   cabin: {
     sceneline: '12:30 PM · Investor call',
