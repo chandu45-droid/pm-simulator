@@ -1549,7 +1549,7 @@ function renderDebrief(){
       '<span class="segs" aria-hidden="true">'+segs+'</span>'+
       '<span class="dval" aria-hidden="true">'+v+'/5</span></div>';
   }
-  out += '<p class="dimnote"><em>Different paths through this scenario can score high on different dimensions — there is no single correct route, and more than one route reaches “Board-ready”.</em></p></div>';
+  out += '<p class="dimnote"><em>Different paths through this scenario can score high on different dimensions — there is no single correct route, and more than one route reaches “'+SC().debrief.bands.title['A'].replace(/\.$/,'')+'”.</em></p></div>';
   /* waitlist CTA */
   out += '<div class="ctacard"><h2>That was one '+((SC().clock&&SC().clock.day)||'Monday')+'. The job is hundreds of them.</h2>'+
     '<div class="cbody">Want harder cases? Join the waitlist and tell us what to build next — you’ll be first in when the next one ships.</div>'+
