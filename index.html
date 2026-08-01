@@ -698,6 +698,9 @@ function meterLabel(){
   if (S.phase==='boardroom') return 'Step 6 of 6 — The final word';
   return 'Moves left: '+(4 - S.picks.length);
 }
+function barStepPhase(){
+  return S.phase==='decision' || S.phase==='boardroom';
+}
 function refreshMeter(){
   var d = $('#pickdots'); if (d) d.innerHTML = pipsHTML();
   var ml = $('#movesleft'); if (ml) ml.textContent = meterLabel();
@@ -709,7 +712,7 @@ function daybarHTML(){
   return '<header class="daybar" id="daybar"><button class="logo-btn" id="logobtn" aria-label="'+SC().onepagerLabel+'">'+
     '<span class="logo-tile" aria-hidden="true">'+SC().tile+'</span><span class="wordmark">'+SC().company+'</span></button>'+
     '<div class="meter"><div class="dots" id="pickdots" aria-hidden="true">'+pipsHTML()+'</div>'+
-    '<div class="moves" id="movesleft">'+meterLabel()+'</div>'+
+    (barStepPhase() ? '' : '<div class="moves" id="movesleft">'+meterLabel()+'</div>')+
     '<span class="vh" aria-live="polite" id="clocklive"></span></div>'+
     '<div class="daybar-right"><button class="hub-btn" id="hubbtn" aria-label="Case Files — all cases">'+SVG.grid+'</button><div class="clockchip'+cls+'" id="clockchip"><span id="clockglyph" aria-hidden="true">'+glyph+'</span>'+
     '<span class="timeslot"><span class="tstack" id="tstack"><span>'+t+'</span></span></span></div>'+
@@ -1096,7 +1099,7 @@ function notesContent(isRail){
   wrap.appendChild(inbox);
   wireInboxRows(inbox);
   if (S.phase!=='intro'){
-    var d = h('<div class="notesentry"><div class="nlabel">9:10 · The dashboard</div></div>');
+    var d = h('<div class="notesentry"><div class="nlabel">'+((SC().clock&&SC().clock.orientTime)||'9:10')+' · The dashboard</div></div>');
     d.appendChild(h(dashCardHTML()));
     wrap.appendChild(d);
   }
@@ -1319,7 +1322,7 @@ function renderDecision(){
       '<span class="rdisc" aria-hidden="true"></span><span><span class="rt">'+o.t+'</span><span class="rb" style="display:block">'+o.b+'</span></span></div>';
   }
   $('#stage').innerHTML = '<section class="phase-in" aria-label="Decision">'+
-    '<div class="interstitial"><div class="heroclock">10:45 AM</div>'+
+    '<div class="interstitial"><div class="kicker" style="margin-bottom:var(--sp-2)">'+meterLabel()+'</div><div class="heroclock">10:45 AM</div>'+
     '<div style="margin-top:var(--sp-4)">'+groupHTML(SC().cast[SC().ceoKey], '10:45 AM', ['In my cabin in 5. What are we doing?'])+'</div>'+
     '<p class="plainline">Whatever you know is what you’ll know. Pick your move.</p></div>'+
     '<div class="radiogrid" role="radiogroup" aria-label="Your move" id="radiogrid">'+cards+'</div>'+
@@ -1410,6 +1413,7 @@ function renderBoardroom(){
   }
   var _cab = SC().cabin;
   $('#stage').innerHTML = '<section class="phase-in" aria-label="The cabin"><div class="cabinband">'+
+    '<div class="kicker" style="margin-bottom:var(--sp-2)">'+meterLabel()+'</div>'+
     '<div class="sceneline">'+_cab.sceneline+'</div>'+
     '<p class="narr">'+_cab.narration+'</p>'+
     '<blockquote class="pullquote">'+_cab.pullquote+'<div class="pqby">'+_cab.pqBy+'</div></blockquote>'+
