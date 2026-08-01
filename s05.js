@@ -315,6 +315,7 @@ window.PMSIM.scenarios['s05'] = {
   beginBarText: '12:30 PM — Ishaan’s chat pops up',
   orientHead: 'It’s Thursday, 10:05 AM.',
   clock: { day: 'Thursday', orientTime: '10:05 AM', lockStart: '09:12', lockReveal: '10:05', chatTime: '10:05 AM', deadline: 'until 12:30 PM' },
+  decisionPrompt: "Radhika's dialling in in two minutes. What's the read?",
   chat: { channel: 'turant-hq', avatars: [{ t: 'M', bg: '#BE185D' }, { t: 'D', bg: '#6D28D9' }, { t: 'N', bg: '#B45309' }] },
   cabin: {
     sceneline: '12:30 PM · Investor call',

@@ -351,7 +351,8 @@ window.PMSIM.scenarios['s01'] = {
   lockHint: 'Tap the message from Anurag ↑',
   beginBarText: '10:45 AM — Anurag’s chat pops up',
   orientHead: 'It’s Monday, 9:04 AM.',
-  clock: { day: 'Monday', orientTime: '9:04 AM', lockStart: '07:58', lockReveal: '09:04', chatTime: '9:04 AM', deadline: 'until 10:45' },
+  clock: { day: 'Monday', orientTime: '9:04 AM', lockStart: '07:58', lockReveal: '09:04', chatTime: '9:04 AM', deadline: 'until 10:45', boardroomTime: '10:58 AM' },
+  decisionPrompt: "In my cabin in 5. What are we doing?",
   chat: { channel: 'nukkad-hq', avatars: [{ t: 'S', bg: 'var(--ink-500)' }, { t: 'R', bg: 'var(--brand-600)' }, { t: 'F', bg: 'var(--gain-700)' }] },
   cabin: {
     sceneline: '10:58 AM · Anurag’s cabin',

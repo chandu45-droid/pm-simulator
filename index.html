@@ -598,7 +598,7 @@ function recordCompletion(scenarioId, sc, dims){
 }
 /* ---------- fiction constants ---------- */
 function clockNow(){
-  if (S.phase==='boardroom') return '10:58 AM';
+  if (S.phase==='boardroom') return (SC().clock&&SC().clock.boardroomTime)||SC().times[4];
   if (S.phase==='decision' || S.picks.length>=4) return SC().times[4];
   return SC().times[S.picks.length];
 }
@@ -707,7 +707,7 @@ function refreshMeter(){
 }
 function daybarHTML(){
   var t = clockNow();
-  var cls = t===SC().times[3] ? ' hot' : (t===SC().times[4]||t==='10:58 AM') ? ' locked' : '';
+  var cls = t===SC().times[3] ? ' hot' : (t===SC().times[4]||S.phase==='boardroom') ? ' locked' : '';
   var glyph = cls===' locked' ? SVG.lock : SVG.clock;
   return '<header class="daybar" id="daybar"><button class="logo-btn" id="logobtn" aria-label="'+SC().onepagerLabel+'">'+
     '<span class="logo-tile" aria-hidden="true">'+SC().tile+'</span><span class="wordmark">'+SC().company+'</span></button>'+
@@ -857,7 +857,7 @@ function rollClock(){
     if (lv) lv.textContent = t + (S.picks.length<4 ? ' — '+moves+(moves===1?' move':' moves')+' left' : ' — menu locked');
   };
   var finish = function(){
-    var isHot = t===SC().times[3], isLocked = t===SC().times[4] || t==='10:58 AM';
+    var isHot = t===SC().times[3], isLocked = t===SC().times[4] || S.phase==='boardroom';
     chip.classList.toggle('hot', isHot);
     chip.classList.toggle('locked', isLocked);
     $('#clockglyph').innerHTML = isLocked ? SVG.lock : SVG.clock;
@@ -1322,8 +1322,8 @@ function renderDecision(){
       '<span class="rdisc" aria-hidden="true"></span><span><span class="rt">'+o.t+'</span><span class="rb" style="display:block">'+o.b+'</span></span></div>';
   }
   $('#stage').innerHTML = '<section class="phase-in" aria-label="Decision">'+
-    '<div class="interstitial"><div class="kicker" style="margin-bottom:var(--sp-2)">'+meterLabel()+'</div><div class="heroclock">10:45 AM</div>'+
-    '<div style="margin-top:var(--sp-4)">'+groupHTML(SC().cast[SC().ceoKey], '10:45 AM', ['In my cabin in 5. What are we doing?'])+'</div>'+
+    '<div class="interstitial"><div class="kicker" style="margin-bottom:var(--sp-2)">'+meterLabel()+'</div><div class="heroclock">'+clockNow()+'</div>'+
+    '<div style="margin-top:var(--sp-4)">'+groupHTML(SC().cast[SC().ceoKey], clockNow(), [SC().decisionPrompt])+'</div>'+
     '<p class="plainline">Whatever you know is what you’ll know. Pick your move.</p></div>'+
     '<div class="radiogrid" role="radiogroup" aria-label="Your move" id="radiogrid">'+cards+'</div>'+
     '<div id="conseqwrap"></div></section>';

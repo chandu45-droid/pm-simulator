@@ -1,5 +1,5 @@
 /* Rocket Landing PWA service worker — network-first HTML (deploys never go stale), cache-first assets */
-const CACHE = 'pmsim-v9';
+const CACHE = 'pmsim-v10';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './s01.js', './s02.js', './s03.js', './s04.js', './s05.js'];
 
 self.addEventListener('install', (e) => {

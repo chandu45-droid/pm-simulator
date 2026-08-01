@@ -325,6 +325,7 @@ window.PMSIM.scenarios['s04'] = {
   beginBarText: '5:00 PM — Divakar’s chat pops up',
   orientHead: 'It’s Wednesday, 10:05 AM.',
   clock: { day: 'Wednesday', orientTime: '10:05 AM', lockStart: '08:10', lockReveal: '09:20', chatTime: '9:20 AM', deadline: 'until 5:00 PM' },
+  decisionPrompt: "In the meeting room in five. What's the read?",
   chat: { channel: 'velugu-hq', avatars: [{ t: 'M', bg: '#B45309' }, { t: 'K', bg: '#6D28D9' }, { t: 'L', bg: '#BE185D' }] },
   cabin: {
     sceneline: '5:00 PM · Leadership sync',

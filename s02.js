@@ -322,6 +322,7 @@ window.PMSIM.scenarios['s02'] = {
   beginBarText: '10:55 AM — Kabir’s chat pops up',
   orientHead: 'It’s Monday, 9:02 AM.',
   clock: { day: 'Monday', orientTime: '9:02 AM', lockStart: '08:41', lockReveal: '09:00', chatTime: '9:00 AM', deadline: 'until 11:00' },
+  decisionPrompt: "Alright — what are we building this sprint?",
   chat: { channel: 'rokda-hq', avatars: [{ t: 'M', bg: '#B45309' }, { t: 'A', bg: '#6D28D9' }, { t: 'D', bg: '#BE185D' }] },
   cabin: {
     sceneline: '11:05 AM · Sprint planning',
