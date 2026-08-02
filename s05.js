@@ -57,18 +57,18 @@ var INBOX5 = [
 var MENU_ORDER5 = ['G1','G2','G3','G4','G5','G6','G7','G8','G9','G10','G11','G12'];
 
 var MENU_BY_ID5 = {
-  G1:{t:'Read the viral thread on X.', s:'Every screenshot, every reply, every quote-tweet.', short:'The viral thread', skin:'dump'},
-  G2:{t:'Pull the vulnerable endpoint’s code and check its auth logic with Engineering.', s:'What does this endpoint actually expose — and what does it not?', short:'Endpoint code &amp; auth logic', skin:'chat'},
-  G3:{t:'Check today’s App Store rating and uninstall numbers.', s:'How bad does this look from the outside, right now?', short:'App Store rating &amp; uninstalls', skin:'dump'},
-  G4:{t:'Ask Security to pull the access logs for anomalous request patterns.', s:'Before the researcher’s post — what was already happening?', short:'Anomalous access-log patterns', skin:'chat'},
-  G5:{t:'Sit in on the Comms Lead’s crisis-statement pitch.', s:'Hear the proposed line straight from Nisha, in person.', short:'Comms’ crisis-statement pitch', skin:'chat'},
-  G6:{t:'Pull Support’s ticket volume and pattern since the thread went viral.', s:'Not just the count — what are people actually saying?', short:'Support ticket volume &amp; pattern', skin:'dump'},
-  G7:{t:'DM the security researcher directly.', s:'Ask what she actually found — and how she found it.', short:'DM the researcher', skin:'chat'},
-  G8:{t:'Audit the endpoint’s rate-limiting and monitoring/alerting setup.', s:'How would anyone even know if this were still happening?', short:'Rate-limiting &amp; alerting audit', skin:'dump'},
-  G9:{t:'Ask Legal to check the funding term sheet’s material-adverse-change clause.', s:'Does a security incident put tomorrow’s signing at risk?', short:'Term sheet MAC clause', skin:'chat'},
-  G10:{t:'Ask Legal to walk through exactly what India’s data-protection law requires here, and by when.', s:'What’s the real clock, and who actually has to be told?', short:'DPDP notification requirements', skin:'chat'},
-  G11:{t:'Look into the specific account whose order got screenshotted.', s:'Who is she, and what does she say happened?', short:'The screenshotted account', skin:'dump'},
-  G12:{t:'Ask Security to trace where the anomalous scraping traffic is actually coming from.', s:'If it isn’t the researcher, who is it?', short:'Trace the scraping traffic', skin:'chat'}
+  G1:{t:'Read the viral thread on X.', s:'Every screenshot, every reply, every quote-tweet.', short:'The viral thread', skin:'dump', group:'data'},
+  G2:{t:'Pull the vulnerable endpoint’s code and check its auth logic with Engineering.', s:'What does this endpoint actually expose — and what does it not?', short:'Endpoint code &amp; auth logic', skin:'chat', group:'systems', ripple:{who:'devraj', text:'“the fix is simple, forty minutes tops. I just want to understand the blast radius first.”'}},
+  G3:{t:'Check today’s App Store rating and uninstall numbers.', s:'How bad does this look from the outside, right now?', short:'App Store rating &amp; uninstalls', skin:'dump', group:'data'},
+  G4:{t:'Ask Security to pull the access logs for anomalous request patterns.', s:'Before the researcher’s post — what was already happening?', short:'Anomalous access-log patterns', skin:'chat', group:'systems', ripple:{who:'priyank', text:'“running the count now — give me a minute, this might be bigger than the thread.”'}},
+  G5:{t:'Sit in on the Comms Lead’s crisis-statement pitch.', s:'Hear the proposed line straight from Nisha, in person.', short:'Comms’ crisis-statement pitch', skin:'chat', group:'people'},
+  G6:{t:'Pull Support’s ticket volume and pattern since the thread went viral.', s:'Not just the count — what are people actually saying?', short:'Support ticket volume &amp; pattern', skin:'dump', group:'data', ripple:{who:'meher', text:'“these aren’t random. people are describing their exact orders.”'}},
+  G7:{t:'DM the security researcher directly.', s:'Ask what she actually found — and how she found it.', short:'DM the researcher', skin:'chat', group:'people'},
+  G8:{t:'Audit the endpoint’s rate-limiting and monitoring/alerting setup.', s:'How would anyone even know if this were still happening?', short:'Rate-limiting &amp; alerting audit', skin:'dump', group:'systems'},
+  G9:{t:'Ask Legal to check the funding term sheet’s material-adverse-change clause.', s:'Does a security incident put tomorrow’s signing at risk?', short:'Term sheet MAC clause', skin:'chat', group:'people'},
+  G10:{t:'Ask Legal to walk through exactly what India’s data-protection law requires here, and by when.', s:'What’s the real clock, and who actually has to be told?', short:'DPDP notification requirements', skin:'chat', group:'people'},
+  G11:{t:'Look into the specific account whose order got screenshotted.', s:'Who is she, and what does she say happened?', short:'The screenshotted account', skin:'dump', group:'data'},
+  G12:{t:'Ask Security to trace where the anomalous scraping traffic is actually coming from.', s:'If it isn’t the researcher, who is it?', short:'Trace the scraping traffic', skin:'chat', group:'systems'}
 };
 
 var FOPTS5 = [
@@ -316,6 +316,28 @@ window.PMSIM.scenarios['s05'] = {
   orientHead: 'It’s Thursday, 10:05 AM.',
   clock: { day: 'Thursday', orientTime: '10:05 AM', lockStart: '09:12', lockReveal: '10:05', chatTime: '10:05 AM', deadline: 'until 12:30 PM' },
   decisionPrompt: "Radhika's dialling in in two minutes. What's the read?",
+  pressureBeats: [
+    { at: 1, src: '# turant-hq', body: 'The thread just crossed 40,000 views. Two tech reporters have quote-tweeted it.' },
+    { at: 2, src: 'Support queue', body: 'Meher flags a dozen new tickets — customers describing calls that reference their exact recent orders.' },
+    { at: 3, src: 'Legal', body: 'Nabha Capital’s counsel just asked, informally, whether this affects tomorrow’s signing.' }
+  ],
+  theories: {
+    at: 2,
+    prompt: 'If Ishaan asked for your gut call right now — what’s your working theory?',
+    options: [
+      'This is a contained proof-of-concept — one researcher, six screenshots, already patched.',
+      'No financial data was exposed, so the real risk here is reputational, not data risk.',
+      'The access logs likely show this has already been scraped at scale, not just glimpsed.',
+      'This is mostly a PR problem — get ahead of the narrative first, investigate after.'
+    ],
+    rightIndex: 2,
+    rightLine: 'You had it — the logs showed an automated client had already pulled roughly 87% of orders over 19 days, long before the thread went viral.',
+    wrongLine: 'Not quite — the real story was in the access logs: an automated client had already pulled roughly 87% of orders over 19 days.'
+  },
+  openBubbles: [
+    { who: 'meher', bubbles: ['support’s getting calls that reference the thread already'] },
+    { who: 'priyank', bubbles: ['checking the logs now, give me a minute'] }
+  ],
   chat: { channel: 'turant-hq', avatars: [{ t: 'M', bg: '#BE185D' }, { t: 'D', bg: '#6D28D9' }, { t: 'N', bg: '#B45309' }] },
   cabin: {
     sceneline: '12:30 PM · Investor call',

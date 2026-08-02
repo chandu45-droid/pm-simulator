@@ -58,18 +58,18 @@ var INBOX = [
 var MENU_ORDER = ['A6','A2','A9','A4','A1','A12','A7','A3','A10','A11','A5','A8'];
 
 var MENU_BY_ID = {
-  A1:{t:'Pull the payment-method split.', s:'Ask analytics for orders by payment method, weekend vs baseline.', short:'Payment-method split', skin:'chat'},
-  A2:{t:'Read the actual complaints.', s:'Open the raw support ticket texts, not the category counts.', short:'Raw complaints', skin:'dump'},
-  A3:{t:'Ask engineering what <em>exactly</em> shipped.', s:'Not “any issues?” — the full release diff, in plain words.', short:'What exactly shipped', skin:'chat'},
-  A4:{t:'Check Android vs iOS.', s:'Split the order drop by platform.', short:'Android vs iOS', skin:'chat'},
-  A5:{t:'City-wise damage report.', s:'Order change per city, with each city’s payment mix.', short:'City-wise damage', skin:'chat'},
-  A6:{t:'Call the CEO back first.', s:'Get ahead of it — ask him what the board actually needs to hear.', short:'Call with Anurag', skin:'call'},
-  A7:{t:'New vs returning users.', s:'Is this hitting loyal users or new ones?', short:'New vs returning', skin:'chat'},
-  A8:{t:'Audit the tracking.', s:'Growth thinks the new checkout broke analytics events. Verify the numbers are even real.', short:'Tracking audit', skin:'chat'},
-  A9:{t:'Check crash &amp; ANR dashboards.', s:'Maybe the app is just breaking on some devices.', short:'Crash dashboards', skin:'dump'},
-  A10:{t:'Scan promos &amp; competitors.', s:'Did marketing change anything? Did a rival launch an offer this weekend?', short:'Promos &amp; competitors', skin:'chat'},
-  A11:{t:'Order-size histogram.', s:'Which basket sizes disappeared — small carts or big carts?', short:'Order-size histogram', skin:'chat'},
-  A12:{t:'Ping the city ops WhatsApp group.', s:'The ground team always knows something HQ doesn’t.', short:'Ops WhatsApp group', skin:'ops'}
+  A1:{t:'Pull the payment-method split.', s:'Ask analytics for orders by payment method, weekend vs baseline.', short:'Payment-method split', skin:'chat', group:'data'},
+  A2:{t:'Read the actual complaints.', s:'Open the raw support ticket texts, not the category counts.', short:'Raw complaints', skin:'dump', group:'data', ripple:{who:'farheen', text:'“finally — someone’s reading the actual words, not just the category counts.”'}},
+  A3:{t:'Ask engineering what <em>exactly</em> shipped.', s:'Not “any issues?” — the full release diff, in plain words.', short:'What exactly shipped', skin:'chat', group:'systems', ripple:{who:'dhruv', text:'a minute of silence in the channel, then: “it was in the approved build. Nothing broke.”'}},
+  A4:{t:'Check Android vs iOS.', s:'Split the order drop by platform.', short:'Android vs iOS', skin:'chat', group:'data'},
+  A5:{t:'City-wise damage report.', s:'Order change per city, with each city’s payment mix.', short:'City-wise damage', skin:'chat', group:'data'},
+  A6:{t:'Call the CEO back first.', s:'Get ahead of it — ask him what the board actually needs to hear.', short:'Call with Anurag', skin:'call', group:'people'},
+  A7:{t:'New vs returning users.', s:'Is this hitting loyal users or new ones?', short:'New vs returning', skin:'chat', group:'data'},
+  A8:{t:'Audit the tracking.', s:'Growth thinks the new checkout broke analytics events. Verify the numbers are even real.', short:'Tracking audit', skin:'chat', group:'systems', ripple:{who:'riya', text:'“told you the pipeline’s fine 🙂”'}},
+  A9:{t:'Check crash &amp; ANR dashboards.', s:'Maybe the app is just breaking on some devices.', short:'Crash dashboards', skin:'dump', group:'systems'},
+  A10:{t:'Scan promos &amp; competitors.', s:'Did marketing change anything? Did a rival launch an offer this weekend?', short:'Promos &amp; competitors', skin:'chat', group:'data'},
+  A11:{t:'Order-size histogram.', s:'Which basket sizes disappeared — small carts or big carts?', short:'Order-size histogram', skin:'chat', group:'data'},
+  A12:{t:'Ping the city ops WhatsApp group.', s:'The ground team always knows something HQ doesn’t.', short:'Ops WhatsApp group', skin:'ops', group:'people'}
 };
 
 var FOPTS = [
@@ -353,6 +353,34 @@ window.PMSIM.scenarios['s01'] = {
   orientHead: 'It’s Monday, 9:04 AM.',
   clock: { day: 'Monday', orientTime: '9:04 AM', lockStart: '07:58', lockReveal: '09:04', chatTime: '9:04 AM', deadline: 'until 10:45', boardroomTime: '10:58 AM' },
   decisionPrompt: "In my cabin in 5. What are we doing?",
+  /* GFR-11: pressure beats -- fire on pick count, not wall-clock, so they stay
+     deterministic and testable. GFR-10's CEO nudge is just another beat here. */
+  pressureBeats: [
+    { at: 1, src: 'Support queue', body: 'Ticket volume just crossed 2,000 for the weekend. Farheen’s team is drowning.' },
+    { at: 2, src: '# nukkad-hq', body: 'Someone just posted: “is COD actually gone?? getting slammed out here”' },
+    { at: 3, src: 'Board prep', body: 'Aditya’s pre-read just landed in your inbox. The 11:00 call is still on.' }
+  ],
+  /* GFR-12: unscored working-theory beat -- rightIndex/rightLine/wrongLine only drive
+     the debrief payoff line, never S.picks/decision/framing scoring. */
+  theories: {
+    at: 2,
+    prompt: 'If Anurag walked in right now — what’s your working theory?',
+    options: [
+      'COD got buried in the new checkout — a design mistake, not a market shift.',
+      'A competitor launched something this weekend and we’re bleeding orders to them.',
+      'The app is breaking for a chunk of users — a technical bug, not a business one.',
+      'Before blaming anything else — the numbers themselves might be wrong.'
+    ],
+    rightIndex: 0,
+    rightLine: 'You had it — the redesign buried COD below the fold, and that’s the whole story.',
+    wrongLine: 'Not quite — the real story was COD getting buried below the fold in the new checkout.'
+  },
+  /* GFR-19: teammates post before Anurag -- you walk into a conversation already
+     in progress, not a stage with one actor waiting for you to arrive. */
+  openBubbles: [
+    { who: 'farheen', bubbles: ['queue’s already past 40 and climbing before 9. anyone else seeing this?'] },
+    { who: 'dhruv', bubbles: ['saw it. pulling up the release now.'] }
+  ],
   chat: { channel: 'nukkad-hq', avatars: [{ t: 'S', bg: 'var(--ink-500)' }, { t: 'R', bg: 'var(--brand-600)' }, { t: 'F', bg: 'var(--gain-700)' }] },
   cabin: {
     sceneline: '10:58 AM · Anurag’s cabin',

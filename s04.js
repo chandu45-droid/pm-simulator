@@ -54,18 +54,18 @@ var INBOX4 = [
 var MENU_ORDER4 = ['E1','E2','E3','E4','E5','E6','E7','E8','E9','E10','E11','E12'];
 
 var MENU_BY_ID4 = {
-  E1:{t:'Scan competitor pricing and promotions.', s:'StreamKatha and the other regional OTT apps — did anyone launch a cheaper plan or a big sale this month?', short:'Competitor pricing &amp; promotions', skin:'dump'},
-  E2:{t:'Check exactly how the “Day-30 renewal rate” is computed.', s:'Ask Data for the literal cohort definition, not what everyone assumes it means.', short:'Renewal-rate definition', skin:'chat'},
-  E3:{t:'Ask Marketing about campaign overlap.', s:'Did anything else launch the same week Project Uttama hit 100%?', short:'Campaign overlap', skin:'dump'},
-  E4:{t:'Pull the renewal rate split by plan type.', s:'The legacy single-language tier vs the new merged Velugu Plus tier.', short:'Renewal split by plan', skin:'chat'},
-  E5:{t:'Review the pricing rollout’s test design.', s:'Sample size, holdout, significance — was the test itself run properly?', short:'Rollout test design', skin:'dump'},
-  E6:{t:'Check device and network mix.', s:'Is the drop concentrated on a particular phone type, or is it everyone?', short:'Device/network mix', skin:'chat'},
-  E7:{t:'Read the raw cancellation and support tickets.', s:'Open the actual ticket text, not the category counts.', short:'Raw cancellation tickets', skin:'dump'},
-  E8:{t:'Audit the price-change notification and in-app messaging.', s:'Read every screen and message yourself.', short:'Notification &amp; messaging audit', skin:'dump'},
-  E9:{t:'Sit in on Meenal’s monetization readout.', s:'Hear the “Uttama worked” pitch straight from Pricing, in person.', short:'Meenal’s readout', skin:'chat'},
-  E10:{t:'Check how many quarterly subscribers have hit a renewal date.', s:'Not just the ones who have.', short:'Renewal-date coverage', skin:'chat'},
-  E11:{t:'Pull Support’s ticket-load and staffing report.', s:'Find out how the team is coping with the surge.', short:'Support SLA &amp; staffing', skin:'dump'},
-  E12:{t:'Compare regional-language watch-time before and after the tier merge.', s:'Are people actually using what they’re now paying for?', short:'Watch-time by language', skin:'chat'}
+  E1:{t:'Scan competitor pricing and promotions.', s:'StreamKatha and the other regional OTT apps — did anyone launch a cheaper plan or a big sale this month?', short:'Competitor pricing &amp; promotions', skin:'dump', group:'data'},
+  E2:{t:'Check exactly how the “Day-30 renewal rate” is computed.', s:'Ask Data for the literal cohort definition, not what everyone assumes it means.', short:'Renewal-rate definition', skin:'chat', group:'systems', ripple:{who:'meenal', text:'“the rollout was tested properly. 74 percent is a real number.”'}},
+  E3:{t:'Ask Marketing about campaign overlap.', s:'Did anything else launch the same week Project Uttama hit 100%?', short:'Campaign overlap', skin:'dump', group:'people'},
+  E4:{t:'Pull the renewal rate split by plan type.', s:'The legacy single-language tier vs the new merged Velugu Plus tier.', short:'Renewal split by plan', skin:'chat', group:'data', ripple:{who:'aditya', text:'“once you split it by tier, the blended number stops meaning much.”'}},
+  E5:{t:'Review the pricing rollout’s test design.', s:'Sample size, holdout, significance — was the test itself run properly?', short:'Rollout test design', skin:'dump', group:'systems'},
+  E6:{t:'Check device and network mix.', s:'Is the drop concentrated on a particular phone type, or is it everyone?', short:'Device/network mix', skin:'chat', group:'data'},
+  E7:{t:'Read the raw cancellation and support tickets.', s:'Open the actual ticket text, not the category counts.', short:'Raw cancellation tickets', skin:'dump', group:'data', ripple:{who:'lavanya', text:'“same complaint, different subscriber. every single ticket.”'}},
+  E8:{t:'Audit the price-change notification and in-app messaging.', s:'Read every screen and message yourself.', short:'Notification &amp; messaging audit', skin:'dump', group:'systems'},
+  E9:{t:'Sit in on Meenal’s monetization readout.', s:'Hear the “Uttama worked” pitch straight from Pricing, in person.', short:'Meenal’s readout', skin:'chat', group:'people'},
+  E10:{t:'Check how many quarterly subscribers have hit a renewal date.', s:'Not just the ones who have.', short:'Renewal-date coverage', skin:'chat', group:'data'},
+  E11:{t:'Pull Support’s ticket-load and staffing report.', s:'Find out how the team is coping with the surge.', short:'Support SLA &amp; staffing', skin:'dump', group:'systems'},
+  E12:{t:'Compare regional-language watch-time before and after the tier merge.', s:'Are people actually using what they’re now paying for?', short:'Watch-time by language', skin:'chat', group:'data'}
 };
 
 var FOPTS4 = [
@@ -326,6 +326,28 @@ window.PMSIM.scenarios['s04'] = {
   orientHead: 'It’s Wednesday, 10:05 AM.',
   clock: { day: 'Wednesday', orientTime: '10:05 AM', lockStart: '08:10', lockReveal: '09:20', chatTime: '9:20 AM', deadline: 'until 5:00 PM' },
   decisionPrompt: "In the meeting room in five. What's the read?",
+  pressureBeats: [
+    { at: 1, src: 'Support queue', body: 'Lavanya’s team flags another batch of tickets — same complaint, different subscribers.' },
+    { at: 2, src: '# velugu-hq', body: 'Meenal just posted: “Day-30 renewal is holding at 74%, Uttama is working as designed”' },
+    { at: 3, src: 'Board prep', body: 'Kavach’s pre-read just landed. They want the renewal trend by tier, not just the blended number.' }
+  ],
+  theories: {
+    at: 2,
+    prompt: 'If Divakar asked for your gut call right now — what’s your working theory?',
+    options: [
+      'It’s a seasonal release-calendar dip — nothing to do with the price change.',
+      'The rollout was tested properly, so the blended lift number can be trusted.',
+      'The renewal metric itself is blind to the segment that actually changed — the real number is hidden inside the blend.',
+      'Regional-language subscribers are simply less loyal than the merged tier assumed.'
+    ],
+    rightIndex: 2,
+    rightLine: 'You had it — the metric’s own definition buried the collapsing segment inside a mostly-unaffected blend.',
+    wrongLine: 'Not quite — the real story was the renewal metric itself burying a collapsing segment inside a mostly-unaffected blend.'
+  },
+  openBubbles: [
+    { who: 'lavanya', bubbles: ['same complaint again — three more tickets since last night'] },
+    { who: 'aditya', bubbles: ['pulling the renewal numbers, one sec'] }
+  ],
   chat: { channel: 'velugu-hq', avatars: [{ t: 'M', bg: '#B45309' }, { t: 'K', bg: '#6D28D9' }, { t: 'L', bg: '#BE185D' }] },
   cabin: {
     sceneline: '5:00 PM · Leadership sync',

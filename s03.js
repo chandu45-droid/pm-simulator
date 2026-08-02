@@ -51,18 +51,18 @@ var INBOX3 = [
 var MENU_ORDER3 = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10','C11','C12'];
 
 var MENU_BY_ID3 = {
-  C1:{t:'Scan competitor pricing and offers.', s:'TestBazaar and the other exam-prep apps — did anyone undercut us this month?', short:'Competitor pricing', skin:'dump'},
-  C2:{t:'Check exactly what fires the “activation” event.', s:'Ask Data for the event’s literal definition, not what everyone assumes it means.', short:'Activation event definition', skin:'chat'},
-  C3:{t:'Ask Marketing about campaign overlap.', s:'Did anything else launch the same week as Sprint’s full rollout?', short:'Campaign overlap', skin:'chat'},
-  C4:{t:'Cross-check recommended course against stated target exam.', s:'Pull how often the app’s course recommendation actually matches what the user said they’re preparing for.', short:'Course-match cross-reference', skin:'chat'},
-  C5:{t:'Review the A/B test’s statistical rigor.', s:'Sample size, significance, randomization — was the test itself run properly?', short:'A/B test rigor', skin:'chat'},
-  C6:{t:'Check device and network mix.', s:'Is the drop concentrated on 2G phones, or is it everyone?', short:'Device/network mix', skin:'chat'},
-  C7:{t:'Read the raw support and refund tickets.', s:'Open the actual ticket text, not the category counts.', short:'Raw support tickets', skin:'dump'},
-  C8:{t:'Audit the onboarding screen copy.', s:'Read every label and button on the new flow yourself.', short:'Onboarding copy audit', skin:'dump'},
-  C9:{t:'Sit in on Neha’s growth review walkthrough.', s:'Hear the activation-lift pitch straight from Growth, in person.', short:'Neha’s walkthrough', skin:'chat'},
-  C10:{t:'Pull 7-day conversion and 30-day retention, new flow vs old.', s:'Not just Day-1 activation — what happens after.', short:'7-day/30-day cohort', skin:'chat'},
-  C11:{t:'Pull Support’s ticket-load and staffing report.', s:'Find out how the team is coping with the surge.', short:'Support SLA &amp; staffing', skin:'dump'},
-  C12:{t:'Check how much of the “started” lesson users actually watched.', s:'Activation says “started.” Find out if anyone actually watched.', short:'Watch-depth check', skin:'chat'}
+  C1:{t:'Scan competitor pricing and offers.', s:'TestBazaar and the other exam-prep apps — did anyone undercut us this month?', short:'Competitor pricing', skin:'dump', group:'data'},
+  C2:{t:'Check exactly what fires the “activation” event.', s:'Ask Data for the event’s literal definition, not what everyone assumes it means.', short:'Activation event definition', skin:'chat', group:'systems', ripple:{who:'neha', text:'“the test was clean. 60 to 85 percent, a real lift.”'}},
+  C3:{t:'Ask Marketing about campaign overlap.', s:'Did anything else launch the same week as Sprint’s full rollout?', short:'Campaign overlap', skin:'chat', group:'people'},
+  C4:{t:'Cross-check recommended course against stated target exam.', s:'Pull how often the app’s course recommendation actually matches what the user said they’re preparing for.', short:'Course-match cross-reference', skin:'chat', group:'data'},
+  C5:{t:'Review the A/B test’s statistical rigor.', s:'Sample size, significance, randomization — was the test itself run properly?', short:'A/B test rigor', skin:'chat', group:'systems'},
+  C6:{t:'Check device and network mix.', s:'Is the drop concentrated on 2G phones, or is it everyone?', short:'Device/network mix', skin:'chat', group:'data'},
+  C7:{t:'Read the raw support and refund tickets.', s:'Open the actual ticket text, not the category counts.', short:'Raw support tickets', skin:'dump', group:'data', ripple:{who:'ayesha', text:'“these have been saying the same thing for days. glad someone’s reading them.”'}},
+  C8:{t:'Audit the onboarding screen copy.', s:'Read every label and button on the new flow yourself.', short:'Onboarding copy audit', skin:'dump', group:'systems'},
+  C9:{t:'Sit in on Neha’s growth review walkthrough.', s:'Hear the activation-lift pitch straight from Growth, in person.', short:'Neha’s walkthrough', skin:'chat', group:'people'},
+  C10:{t:'Pull 7-day conversion and 30-day retention, new flow vs old.', s:'Not just Day-1 activation — what happens after.', short:'7-day/30-day cohort', skin:'chat', group:'data', ripple:{who:'rohan', text:'“day-1 activation and 30-day retention are telling two different stories.”'}},
+  C11:{t:'Pull Support’s ticket-load and staffing report.', s:'Find out how the team is coping with the surge.', short:'Support SLA &amp; staffing', skin:'dump', group:'systems'},
+  C12:{t:'Check how much of the “started” lesson users actually watched.', s:'Activation says “started.” Find out if anyone actually watched.', short:'Watch-depth check', skin:'chat', group:'data'}
 };
 
 var FOPTS3 = [
@@ -326,6 +326,28 @@ window.PMSIM.scenarios['s03'] = {
   orientHead: 'It’s Thursday, 9:12 AM.',
   clock: { day: 'Thursday', orientTime: '9:12 AM', lockStart: '08:20', lockReveal: '09:05', chatTime: '9:05 AM', deadline: 'until 4:00 PM' },
   decisionPrompt: "In the conference room in five. What's the read?",
+  pressureBeats: [
+    { at: 1, src: 'Support queue', body: 'Refund requests are up again this hour. Ayesha’s team is flagging the same complaint on repeat.' },
+    { at: 2, src: '# gyansetu-hq', body: 'Neha just posted: “activation is at 85%, can we lock the Sprint results in today’s update?”' },
+    { at: 3, src: 'Board prep', body: 'Prospera’s pre-read just landed. They’re asking about the retention numbers specifically.' }
+  ],
+  theories: {
+    at: 2,
+    prompt: 'If Saurabh asked for your gut call right now — what’s your working theory?',
+    options: [
+      'The new activation number is basically the same behavior, just counted differently.',
+      'It’s a seasonal dip — SSC’s exam date moved, nothing structural changed.',
+      'Skipping the diagnostic is dumping users into the wrong course, and that’s hurting real outcomes.',
+      'The A/B test was solid, so the metric can be trusted as-is.'
+    ],
+    rightIndex: 2,
+    rightLine: 'You had it — skipping the diagnostic broke course-matching, and that’s what actually moved conversion and retention.',
+    wrongLine: 'Not quite — the real story was the skipped diagnostic breaking course-matching, dumping most new users into the wrong syllabus.'
+  },
+  openBubbles: [
+    { who: 'ayesha', bubbles: ['refund requests ticking up again this morning'] },
+    { who: 'rohan', bubbles: ['looking into the activation number now, something’s odd'] }
+  ],
   chat: { channel: 'gyansetu-hq', avatars: [{ t: 'N', bg: '#B45309' }, { t: 'V', bg: '#6D28D9' }, { t: 'A', bg: '#BE185D' }] },
   cabin: {
     sceneline: '4:00 PM · Growth review',

@@ -53,18 +53,18 @@ var INBOX2 = [
 var MENU_ORDER2 = ['B1','B2','B3','B4','B5','B6','B7','B8','B9','B10','B11','B12'];
 
 var MENU_BY_ID2 = {
-  B1:{t:'Escalate to Kabir for a snap call.', s:'He’s got five minutes before his next meeting. Ask him to just make the decision.', short:'Escalate to Kabir', skin:'call'},
-  B2:{t:'Pull a success-rate cut by device and town tier.', s:'Ask Data to split this week’s number instead of taking the blended average at face value.', short:'Segment cut', skin:'chat'},
-  B3:{t:'Ask Finance for a revenue breakdown by merchant segment.', s:'Get the real numbers behind SMB vs. enterprise revenue mix.', short:'Finance breakdown', skin:'chat'},
-  B4:{t:'Read a sample of this week’s payment-failure tickets.', s:'Open ten real tickets from the support queue instead of the summary count.', short:'Ticket sample', skin:'dump'},
-  B5:{t:'Look at PaisaJet’s app and marketing site.', s:'The Growth team keeps citing this competitor’s rewards program. See it yourself.', short:'PaisaJet’s site', skin:'dump'},
-  B6:{t:'Pull Support’s SLA and staffing report.', s:'Find out how the team is actually coping with 4x ticket volume.', short:'SLA &amp; staffing', skin:'dump'},
-  B7:{t:'Check the payments network’s quarterly compliance dashboard.', s:'See where Rokda actually stands against the mandated success-rate floor.', short:'Compliance dashboard', skin:'dump'},
-  B8:{t:'Read a random sample of the last 50 App Store reviews.', s:'Not just the one-star headline count — what do people actually write?', short:'Review sample', skin:'dump'},
-  B9:{t:'Sit in on Growth’s morning stand-up.', s:'Hear Meher’s pitch directly from the team, not secondhand.', short:'Growth’s stand-up', skin:'chat'},
-  B10:{t:'Read last year’s festival-season engineering postmortem.', s:'Rokda had a rough Diwali before this one too. Find the writeup.', short:'Last year’s postmortem', skin:'dump'},
-  B11:{t:'Check Saral Mart’s contract and renewal notes.', s:'Understand what the enterprise account actually needs and by when.', short:'Saral Mart notes', skin:'dump'},
-  B12:{t:'Cross-reference failed transactions against merchant churn.', s:'See if merchants who hit failures are actually leaving.', short:'Churn cross-reference', skin:'chat'}
+  B1:{t:'Escalate to Kabir for a snap call.', s:'He’s got five minutes before his next meeting. Ask him to just make the decision.', short:'Escalate to Kabir', skin:'call', group:'people'},
+  B2:{t:'Pull a success-rate cut by device and town tier.', s:'Ask Data to split this week’s number instead of taking the blended average at face value.', short:'Segment cut', skin:'chat', group:'data', ripple:{who:'neel', text:'“this doesn’t look like a rewards problem to me.”'}},
+  B3:{t:'Ask Finance for a revenue breakdown by merchant segment.', s:'Get the real numbers behind SMB vs. enterprise revenue mix.', short:'Finance breakdown', skin:'chat', group:'data'},
+  B4:{t:'Read a sample of this week’s payment-failure tickets.', s:'Open ten real tickets from the support queue instead of the summary count.', short:'Ticket sample', skin:'dump', group:'data', ripple:{who:'divya', text:'hesitant: “um — a lot of these say ‘debited, not confirmed.’ probably nothing?”'}},
+  B5:{t:'Look at PaisaJet’s app and marketing site.', s:'The Growth team keeps citing this competitor’s rewards program. See it yourself.', short:'PaisaJet’s site', skin:'dump', group:'data'},
+  B6:{t:'Pull Support’s SLA and staffing report.', s:'Find out how the team is actually coping with 4x ticket volume.', short:'SLA &amp; staffing', skin:'dump', group:'systems'},
+  B7:{t:'Check the payments network’s quarterly compliance dashboard.', s:'See where Rokda actually stands against the mandated success-rate floor.', short:'Compliance dashboard', skin:'dump', group:'systems'},
+  B8:{t:'Read a random sample of the last 50 App Store reviews.', s:'Not just the one-star headline count — what do people actually write?', short:'Review sample', skin:'dump', group:'data'},
+  B9:{t:'Sit in on Growth’s morning stand-up.', s:'Hear Meher’s pitch directly from the team, not secondhand.', short:'Growth’s stand-up', skin:'chat', group:'people'},
+  B10:{t:'Read last year’s festival-season engineering postmortem.', s:'Rokda had a rough Diwali before this one too. Find the writeup.', short:'Last year’s postmortem', skin:'dump', group:'systems'},
+  B11:{t:'Check Saral Mart’s contract and renewal notes.', s:'Understand what the enterprise account actually needs and by when.', short:'Saral Mart notes', skin:'dump', group:'data', ripple:{who:'arjun', text:'“Saral Mart’s renewal is the real number here, don’t lose the thread.”'}},
+  B12:{t:'Cross-reference failed transactions against merchant churn.', s:'See if merchants who hit failures are actually leaving.', short:'Churn cross-reference', skin:'chat', group:'data'}
 };
 
 var FOPTS2 = [
@@ -323,6 +323,28 @@ window.PMSIM.scenarios['s02'] = {
   orientHead: 'It’s Monday, 9:02 AM.',
   clock: { day: 'Monday', orientTime: '9:02 AM', lockStart: '08:41', lockReveal: '09:00', chatTime: '9:00 AM', deadline: 'until 11:00' },
   decisionPrompt: "Alright — what are we building this sprint?",
+  pressureBeats: [
+    { at: 1, src: 'Support queue', body: 'Ticket volume is now 4x a normal evening. Every one of them is a “money left my account” complaint.' },
+    { at: 2, src: '# rokda-hq', body: 'Meher just posted: “PaisaJet’s rewards push is eating us alive, we need a counter-offer today”' },
+    { at: 3, src: 'App Store', body: 'Rating just ticked down to 3.6. Two new one-star reviews in the last ten minutes.' }
+  ],
+  theories: {
+    at: 2,
+    prompt: 'If Kabir asked for your gut call right now — what’s your working theory?',
+    options: [
+      'PaisaJet’s rewards program is pulling merchants and users away from us.',
+      'There’s a payment-processing bug failing silently under load — not a rewards problem.',
+      'Saral Mart’s renewal is the real fire; the rest is noise.',
+      'It’s just normal festival-season volume stress — nothing structurally broken.'
+    ],
+    rightIndex: 1,
+    rightLine: 'You had it — a retry/reconciliation failure under high-concurrency evening load, wearing three different costumes on the dashboard.',
+    wrongLine: 'Not quite — the real story was a payment retry/reconciliation bug failing silently under evening load, showing up three different ways on the dashboard.'
+  },
+  openBubbles: [
+    { who: 'divya', bubbles: ['sorry to ping this early — ticket volume’s already 3x normal for this hour'] },
+    { who: 'neel', bubbles: ['on it. numbers look off, give me a few minutes'] }
+  ],
   chat: { channel: 'rokda-hq', avatars: [{ t: 'M', bg: '#B45309' }, { t: 'A', bg: '#6D28D9' }, { t: 'D', bg: '#BE185D' }] },
   cabin: {
     sceneline: '11:05 AM · Sprint planning',
